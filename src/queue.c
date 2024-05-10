@@ -8,13 +8,43 @@ int empty(struct queue_t * q) {
 }
 
 void enqueue(struct queue_t * q, struct pcb_t * proc) {
-        /* TODO: put a new process to queue [q] */
+        /* (done) TODO: put a new process to queue [q] */
+
+        if (q->size >= MAX_QUEUE_SIZE) {
+                return;
+        }
+
+        q->proc[q->size] = proc;
+        q->size++;
 }
 
 struct pcb_t * dequeue(struct queue_t * q) {
-        /* TODO: return a pcb whose prioprity is the highest
+        /* (done) TODO: return a pcb whose prioprity is the highest
          * in the queue [q] and remember to remove it from q
          * */
-	return NULL;
+
+        struct pcb_t *ret = NULL;
+        unsigned ret_index;
+        for (unsigned i = 0; i < q->size; i++) {
+                struct pcb_t *j = q->proc[i];
+#ifdef MLQ_SCHED
+                        if (ret == NULL || j->prio > ret->prio) {
+#else
+                        if (ret == NULL || j->priority > ret->priority) {
+#endif
+                        ret = j;
+                        ret_index = i;
+                }
+        }
+
+        if (ret != NULL) {
+                unsigned last = q->size - 1;
+                // Still works if last == ret_index.
+                q->proc[ret_index] = q->proc[last];
+                q->proc[last] = NULL;
+                q->size--;
+        }
+
+	return ret;
 }
 
