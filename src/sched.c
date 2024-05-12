@@ -53,7 +53,7 @@ void mlq_reset_curr_slots(void) {
  *  State representation   prio = 0 .. MAX_PRIO, curr_slot = 0..(MAX_PRIO - prio)
  */
 struct pcb_t * get_mlq_proc(void) {
-	/* TODO: get a process from PRIORITY [ready_queue].
+	/* (done) TODO: get a process from PRIORITY [ready_queue].
 	 * Remember to use lock to protect the queue.
 	 */
 	struct pcb_t *ret = NULL;
