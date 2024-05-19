@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "queue.h"
 
 int empty(struct queue_t * q) {
@@ -27,11 +28,13 @@ struct pcb_t * dequeue(struct queue_t * q) {
         unsigned ret_index;
         for (unsigned i = 0; i < q->size; i++) {
                 struct pcb_t *j = q->proc[i];
+                bool cond;
 #ifdef MLQ_SCHED
-                        if (ret == NULL || j->prio > ret->prio) {
+                cond = ret == NULL || j->prio > ret->prio;
 #else
-                        if (ret == NULL || j->priority > ret->priority) {
+                cond = ret == NULL || j->priority > ret->priority;
 #endif
+                if (cond) {
                         ret = j;
                         ret_index = i;
                 }
