@@ -411,9 +411,11 @@ struct vm_rg_struct* get_vm_area_node_at_brk(struct pcb_t *caller, int vmaid, in
  */
 int validate_overlap_vm_area(struct pcb_t *caller, int vmaid, int vmastart, int vmaend)
 {
-  //struct vm_area_struct *vma = caller->mm->mmap;
-
-  /* TODO validate the planned memory area is not overlapped */
+  /* (done) TODO: validate the planned memory area is not overlapped */
+  struct vm_area_struct *vma = caller->mm->mmap;
+  if ((vmastart < vma->vm_start) || (vmaend > vma->vm_end)){
+    return -1;
+  }
 
   return 0;
 }
