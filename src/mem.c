@@ -15,12 +15,12 @@ static struct {
 			// page.
 } _mem_stat [NUM_PAGES];
 
-static pthread_mutex_t mem_lock;
+static pthread_mutex_t memphy_lock;
 
 void init_mem(void) {
 	memset(_mem_stat, 0, sizeof(*_mem_stat) * NUM_PAGES);
 	memset(_ram, 0, sizeof(BYTE) * RAM_SIZE);
-	pthread_mutex_init(&mem_lock, NULL);
+	pthread_mutex_init(&memphy_lock, NULL);
 }
 
 /* get offset of the virtual address */
@@ -87,7 +87,7 @@ static int translate(
 }
 
 addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
-	pthread_mutex_lock(&mem_lock);
+	pthread_mutex_lock(&memphy_lock);
 	addr_t ret_mem = 0;
 	/* DO NOTHING HERE. This mem is obsoleted */
 
@@ -115,7 +115,7 @@ addr_t alloc_mem(uint32_t size, struct pcb_t * proc) {
 		 * 	  to ensure accesses to allocated memory slot is
 		 * 	  valid. */
 	}
-	pthread_mutex_unlock(&mem_lock);
+	pthread_mutex_unlock(&memphy_lock);
 	return ret_mem;
 }
 
