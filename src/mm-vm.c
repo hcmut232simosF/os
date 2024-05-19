@@ -8,6 +8,9 @@
 #include "mm.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
+
+pthread_mutex_t memvm_lock;
 
 /*enlist_vm_freerg_list - add new rg to freerg_list
  *@mm: memory region
@@ -16,16 +19,20 @@
  */
 int enlist_vm_freerg_list(struct mm_struct *mm, struct vm_rg_struct rg_elmt)
 {
-  struct vm_rg_struct *rg_node = mm->mmap->vm_freerg_list;
-
-  if (rg_elmt.rg_start >= rg_elmt.rg_end)
+  if (rg_elmt.rg_start >= rg_elmt.rg_end) {
     return -1;
+  }
 
-  if (rg_node != NULL)
-    rg_elmt.rg_next = rg_node;
+  struct vm_rg_struct *region = malloc(sizeof(struct vm_rg_struct));
+  region->rg_end = rg_elmt.rg_end;
+  region->rg_next = rg_elmt.rg_next;
+  region->rg_start = rg_elmt.rg_start;
 
-  /* Enlist the new region */
-  mm->mmap->vm_freerg_list = &rg_elmt;
+  /* Enlist the new region into the linked list */
+  if (mm->mmap->vm_freerg_list != NULL) {
+    region->rg_next = mm->mmap->vm_freerg_list;
+  }
+  mm->mmap->vm_freerg_list = region;
 
   return 0;
 }
