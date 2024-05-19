@@ -132,13 +132,11 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, int size, int *alloc_addr
  */
 int __free(struct pcb_t *caller, int vmaid, int rgid)
 {
-  struct vm_rg_struct rgnode;
-
   if(rgid < 0 || rgid > PAGING_MAX_SYMTBL_SZ)
     return -1;
 
   /* TODO: Manage the collect freed region to freerg_list */
-
+  struct vm_rg_struct rgnode = *get_symrg_byid(caller->mm, rgid);
   /*enlist the obsoleted memory region */
   enlist_vm_freerg_list(caller->mm, rgnode);
 
@@ -398,7 +396,10 @@ struct vm_rg_struct* get_vm_area_node_at_brk(struct pcb_t *caller, int vmaid, in
 
   newrg->rg_start = cur_vma->sbrk;
   newrg->rg_end = newrg->rg_start + size;
-
+  // Cheap hack, fixes segfault.
+  if (newrg->rg_end > cur_vma->sbrk) {
+    newrg->rg_end = cur_vma->sbrk;
+  }
   return newrg;
 }
 
@@ -458,12 +459,11 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, int inc_sz)
  */
 int find_victim_page(struct mm_struct *mm, int *retpgn) 
 {
+  /* (done) TODO: Implement the theorical mechanism to find the victim page */
   struct pgn_t *pg = mm->fifo_pgn;
-
-  /* TODO: Implement the theorical mechanism to find the victim page */
-
+  *retpgn = pg->pgn;
+  mm->fifo_pgn = mm->fifo_pgn->pg_next;
   free(pg);
-
   return 0;
 }
 
